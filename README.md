@@ -2,6 +2,8 @@
 
 このリポジトリは、Claude CodeとCodex CLI用のAgent SkillsとPluginsを管理するためのリポジトリです。
 
+> 🚀 **[クイックスタートガイド](./QUICKSTART.md)** で今すぐ始めましょう！
+
 ## 概要
 
 - **Claude Code Skills**: Claude Codeエージェント用のカスタムスキル定義
