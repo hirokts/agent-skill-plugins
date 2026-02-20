@@ -1,0 +1,73 @@
+{
+  "name": "test-generator",
+  "version": "1.0.0",
+  "description": "ソースコードからユニットテストを自動生成するスキル",
+  "author": "agent-skill-plugins",
+  "parameters": {
+    "sourceFile": {
+      "type": "string",
+      "description": "テスト対象のソースファイル",
+      "required": true
+    },
+    "testFramework": {
+      "type": "string",
+      "description": "使用するテストフレームワーク (jest, mocha, pytest, etc.)",
+      "default": "jest"
+    },
+    "coverage": {
+      "type": "number",
+      "description": "目標カバレッジ率 (%)",
+      "default": 80
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "生成するテストファイルの出力先",
+      "default": "auto"
+    }
+  },
+  "steps": [
+    {
+      "action": "parse-source",
+      "description": "ソースコードを解析",
+      "parameters": {
+        "file": "${sourceFile}"
+      }
+    },
+    {
+      "action": "identify-functions",
+      "description": "テスト対象の関数を特定",
+      "parameters": {
+        "includePrivate": false
+      }
+    },
+    {
+      "action": "generate-test-cases",
+      "description": "テストケースを生成",
+      "parameters": {
+        "framework": "${testFramework}",
+        "targetCoverage": "${coverage}"
+      }
+    },
+    {
+      "action": "write-test-file",
+      "description": "テストファイルを作成",
+      "parameters": {
+        "output": "${outputPath}"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "description": "JavaScriptファイルのテストを生成",
+      "command": "test-generator --sourceFile=./src/utils.js"
+    },
+    {
+      "description": "Pythonファイルのテストを生成（pytest使用）",
+      "command": "test-generator --sourceFile=./app.py --testFramework=pytest"
+    },
+    {
+      "description": "90%のカバレッジを目指してテスト生成",
+      "command": "test-generator --sourceFile=./src/api.js --coverage=90"
+    }
+  ]
+}
