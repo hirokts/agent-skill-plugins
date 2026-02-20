@@ -1,43 +1,39 @@
 ---
 name: peer
-description: >
-  他のAIエージェントとメッセージをやり取りする。
-  「/peer <message>」でメッセージ送信、「/peer」で受信確認。
-  「peerに共有して」「peerの返事見て」などでも起動。
-  使用法: /peer [message] [-fw|--forward] [-c|--clear]
-allowed-tools: Read Bash(bash ~/.claude/skills/peer/scripts/peer.sh:*)
+description: "他のAIエージェントとメッセージを送受信する。「peerに共有して」などでも起動。使用法: /peer [message] [-fw|--forward] [-c|--clear]"
+allowed-tools: Read Bash(bash tools/bin/peer:*)
 ---
 
 # Peer
 
-`messages.md` を介して他のAIエージェントと非同期でメッセージを交換する。
+`tools/bin/peer` と `messages.md` を介して他のAIエージェントと非同期でメッセージを交換する。
 
 ## Location
 
-プロジェクトディレクトリ外に配置。pwdのSHA256でプロジェクトごとに分離。
+プロジェクトルート直下に配置（`.gitignore` 済み）。
 
 ```
-~/.local/share/peer/<sha256-of-pwd>/messages.md
+.peer-chats/messages.md
 ```
 
 ## Usage
 
-- `/peer <message>`: メッセージ送信
-- `/peer -fw`: 直前の自分の応答をそのまま転送 (`--forward` と同義)
-- `/peer -c`: messages.md を削除して会話をリセット (`--clear` と同義)
-- `/peer`: 受信確認
+- `$peer <message>`: メッセージ送信
+- `$peer -fw`: 直前の自分の応答をそのまま転送 (`--forward` と同義)
+- `$peer -c`: messages.md を削除して会話をリセット (`--clear` と同義)
+- `$peer`: 受信確認
 
 ## Script
 
-全操作は [scripts/peer.sh](scripts/peer.sh) で実行する。
+全操作は [tools/bin/peer](../../../tools/bin/peer) で実行する。
 
 ```bash
-bash ~/.claude/skills/peer/scripts/peer.sh <send|read|clear> [message]
+bash tools/bin/peer <send|read|clear> [--name Codex] [message]
 ```
 
 ## Behavior
 
-- `send`: 末尾に `## <Agent>` 付きで追記
+- `send`: 直前のメッセージ + 新規メッセージの2件のみ保持して上書き。`--name` 必須
 - `read`: 内容を表示（要約や送信はエージェント側で判断）
 - `clear`: messages.md を削除
 
@@ -57,14 +53,14 @@ bash ~/.claude/skills/peer/scripts/peer.sh <send|read|clear> [message]
 
 ### 引数なし: 受信確認
 
-1. message.mdの最新メッセージを読んでユーザーに表示
+1. messages.mdの最新メッセージを読んでユーザーに表示
 2. 相手からの未対応の依頼・質問・指摘があれば相手への提案内容をユーザー表示 (例: peerのプランのレビュー依頼ならレビュー結果を表示)
 3. その提案内容を送信する
 
 ## messages.md フォーマット
 
 ```markdown
-## CC
+## Claude
 認証機能のplan作った。JWT + refresh token方式。
 > ref: .claude/plans/auth-plan.md
 
@@ -73,6 +69,6 @@ refresh tokenのローテーション戦略が未定義。
 token revocationの方針も決めるべき。
 ```
 
-- `## <AgentName>` でメッセージ区切り（CC, Codex, Gemini など）
+- `## <AgentName>` でメッセージ区切り（Claude, Codex, Gemini など）
 - `> ref: <path>` で関連ファイルを参照（任意）
 - 自由記述。パース不要、人間も読める

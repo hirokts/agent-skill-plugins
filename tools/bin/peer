@@ -1,17 +1,20 @@
 #!/bin/bash
 set -e
 
-PEER_BASE="$HOME/.local/share/peer"
-DIR=$(pwd -P)
-SHADIR=$(echo "$DIR" | shasum -a 256 | sed "s/  -//")
-PEER_DIR="$PEER_BASE/$SHADIR"
+PEER_DIR=".peer-chats"
 MESSAGES="$PEER_DIR/messages.md"
 
-ACTION="${1:?Usage: peer.sh <send|read|clear> [message]}"
+ACTION="${1:?Usage: peer <send|read|clear> [--name NAME] [message]}"
 shift
 
 case "$ACTION" in
   send)
+    if [ "$1" = "--name" ]; then
+      NAME="$2"; shift 2
+    else
+      echo "エラー: --name is required for send" >&2
+      exit 1
+    fi
     MESSAGE="$*"
     if [ -z "$MESSAGE" ]; then
       echo "エラー: メッセージを指定してください" >&2
@@ -27,9 +30,9 @@ case "$ACTION" in
     fi
     {
       if [ -n "$PREV" ]; then
-        printf "%s\n" "$PREV"
+        printf "%s\n\n" "$PREV"
       fi
-      printf "\n## %s\n%s\n" "${PEER_NAME:-CC}" "$MESSAGE"
+      printf "## %s\n%s\n" "$NAME" "$MESSAGE"
     } > "$MESSAGES"
     echo "送信完了: $MESSAGES"
     ;;
@@ -50,7 +53,7 @@ case "$ACTION" in
     ;;
   *)
     echo "エラー: 不明なアクション: $ACTION" >&2
-    echo "Usage: peer.sh <send|read|clear>" >&2
+    echo "Usage: peer <send|read|clear> [--name NAME] [message]" >&2
     exit 1
     ;;
 esac
