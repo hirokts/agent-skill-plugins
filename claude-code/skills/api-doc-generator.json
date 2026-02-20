@@ -1,0 +1,75 @@
+{
+  "name": "api-doc-generator",
+  "version": "1.0.0",
+  "description": "APIエンドポイントからドキュメントを自動生成するスキル",
+  "author": "agent-skill-plugins",
+  "parameters": {
+    "source": {
+      "type": "string",
+      "description": "APIソースコードのディレクトリまたはファイル",
+      "required": true
+    },
+    "format": {
+      "type": "string",
+      "description": "出力形式 (openapi, swagger, markdown)",
+      "default": "openapi"
+    },
+    "outputFile": {
+      "type": "string",
+      "description": "ドキュメントの出力先ファイル",
+      "default": "./docs/api.yaml"
+    },
+    "includeExamples": {
+      "type": "boolean",
+      "description": "リクエスト/レスポンスの例を含める",
+      "default": true
+    }
+  },
+  "steps": [
+    {
+      "action": "scan-endpoints",
+      "description": "APIエンドポイントをスキャン",
+      "parameters": {
+        "path": "${source}"
+      }
+    },
+    {
+      "action": "extract-metadata",
+      "description": "エンドポイントのメタデータを抽出",
+      "parameters": {
+        "includeParams": true,
+        "includeResponses": true,
+        "includeAuth": true
+      }
+    },
+    {
+      "action": "generate-examples",
+      "description": "使用例を生成",
+      "parameters": {
+        "enabled": "${includeExamples}"
+      }
+    },
+    {
+      "action": "format-documentation",
+      "description": "ドキュメントをフォーマット",
+      "parameters": {
+        "format": "${format}",
+        "output": "${outputFile}"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "description": "Express.jsアプリのAPIドキュメントを生成",
+      "command": "api-doc-generator --source=./src/routes"
+    },
+    {
+      "description": "Swagger形式で出力",
+      "command": "api-doc-generator --source=./api --format=swagger"
+    },
+    {
+      "description": "Markdown形式のドキュメントを生成",
+      "command": "api-doc-generator --source=./src --format=markdown --outputFile=./API.md"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "code-review",
+  "version": "1.0.0",
+  "description": "コードレビューを自動実行するスキル",
+  "author": "agent-skill-plugins",
+  "parameters": {
+    "target": {
+      "type": "string",
+      "description": "レビュー対象のファイルまたはディレクトリ",
+      "required": true
+    },
+    "severity": {
+      "type": "string",
+      "description": "検出する問題の重要度レベル (low, medium, high)",
+      "default": "medium"
+    },
+    "outputFormat": {
+      "type": "string",
+      "description": "出力形式 (text, json, markdown)",
+      "default": "markdown"
+    }
+  },
+  "steps": [
+    {
+      "action": "analyze-code",
+      "description": "コードを解析して問題を検出",
+      "parameters": {
+        "path": "${target}",
+        "checks": [
+          "security",
+          "performance",
+          "style",
+          "best-practices"
+        ]
+      }
+    },
+    {
+      "action": "filter-results",
+      "description": "重要度でフィルタリング",
+      "parameters": {
+        "minSeverity": "${severity}"
+      }
+    },
+    {
+      "action": "format-output",
+      "description": "結果をフォーマット",
+      "parameters": {
+        "format": "${outputFormat}"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "description": "単一ファイルをレビュー",
+      "command": "code-review --target=./src/app.js"
+    },
+    {
+      "description": "ディレクトリ全体をレビュー（高重要度のみ）",
+      "command": "code-review --target=./src --severity=high"
+    },
+    {
+      "description": "JSON形式で出力",
+      "command": "code-review --target=./src --outputFormat=json"
+    }
+  ]
+}
