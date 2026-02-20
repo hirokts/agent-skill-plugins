@@ -92,7 +92,8 @@ module.exports = {
           console.log(`削除対象のブランチ (${branches.length}件):`);
           branches.forEach(b => console.log(`  - ${b}`));
           
-          // CLI frameworks typically convert --dry-run to dryRun in options object
+          // Note: CLI frameworks (e.g., commander, yargs) convert kebab-case option names (--dry-run)
+          // to camelCase property names (dryRun) in the options object
           if (!options.dryRun) {
             for (const branch of branches) {
               await execPromise(`git branch -d ${branch}`);
